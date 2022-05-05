@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<script src="../greenbanksdk.js"></script>
+</head>
+
+
+<body>
+
+	<h1>Hello world</h1>
+	<button onclick="paymerchant()">Pay Merchant</button>
+
+
+	<script>
+		console.log( greenbank.test() )
+		
+		async function paymerchant(){
+			let params = {
+				amount: 300, 
+				currency: 'USD', 
+				description: 'Approval Fee', 
+				domain: 'test',
+				merchant_no: 'F41FC311', 
+				email: 'user@onewattsolar.com', 
+				meta: {
+					txntype: 'approvalfee', 
+					reservation_id: 134
+				} 
+			}
+
+			await greenbank.paymerchant(params)
+			.then((res) =>{
+				// console.log(res)
+			})
+
+			// let res = await greenbank.paymerchant(params)
+			// console.log(res)
+		}
+	</script>
+</body>
+</html>

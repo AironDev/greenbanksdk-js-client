@@ -1,0 +1,25 @@
+{
+  "name": "greenbanksdk-js-client",
+  "version": "1.0.0",
+  "description": "Greenbank Client Javascript SdK",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AironDev/greenbanksdk-js-client.git"
+  },
+  "keywords": [
+    "Greenbank",
+    "SDK",
+    "Merchant",
+    "Buycoin"
+  ],
+  "author": "Airon Dev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AironDev/greenbanksdk-js-client/issues"
+  },
+  "homepage": "https://github.com/AironDev/greenbanksdk-js-client#readme"
+}
