@@ -107,6 +107,7 @@
     }
     exports.exchangeRates = function() {};
     exports.exchange = function() {};
+
 })(typeof exports === 'undefined' ? this['greenbank'] = {} : exports);
 
 
@@ -114,3 +115,7 @@
 // <script>
 //     alert(greenbank.test());
 // </script>
+
+
+// module.exports = {log, shout, whisper};
+
