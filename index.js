@@ -7,7 +7,7 @@
 		document.body.innerHTML += modal;
 
 
-		let loader = `<div id="gb-loader" style=" position: fixed;  margin: auto;  width: 100%;  background-color: rgba(0,0,0,0.4);  height: 100%;  z-index: 1; padding-top: 100px; left: 0; top: 0;"  class="modal"><div id="gb-loader-content" class="modal-content" style=" background-color: #fefefe; margin: auto;  padding: 20px; border: 1px solid #888;  width: 70%;  border-radius: 30px;"><div style="width: 100%;  display: flex;  justify-content: center; margin: auto"><img src="http://greenbankcoin.test/images/processing.gif" id="loading-img" ></div></img></div></div>`
+		let loader = `<div id="gb-loader" style=" position: fixed;  margin: auto;  width: 100%;  background-color: rgba(0,0,0,0.4);  height: 100%;  z-index: 1; padding-top: 100px; left: 0; top: 0;"  class="modal"><div id="gb-loader-content" class="modal-content" style=" background-color: #fefefe; margin: auto;  padding: 20px; border: 1px solid #888;  width: 70%;  border-radius: 30px;"><div style="width: 100%;  display: flex;  justify-content: center; margin: auto"><img src="https://ibank.greenbankcoin.com/images/processing.gif" id="loading-img" ></div></img></div></div>`
 		document.body.innerHTML += loader;
     };
 
@@ -73,12 +73,12 @@
 		    }, 1000)
 		});
 
-        window.addEventListener('message', function (e) {
-            // Get the sent data
-            const data = e.data;
-            const decoded = JSON.parse(data);
-            console.log(decoded)
-        });
+        // window.addEventListener('message', function (e) {
+        //     // Get the sent data
+        //     const data = e.data;
+        //     const decoded = JSON.parse(data);
+        //     console.log(decoded)
+        // });
   
         
     };
