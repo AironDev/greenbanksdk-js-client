@@ -4,11 +4,14 @@
     function openModal () {
     	let modal = `<div id="gb-modal" style="display: none; position: fixed;  margin: auto;  width: 100%;  background-color: rgba(0,0,0,0.4);  height: 100%;  z-index: 99999; padding-top: 100px; left: 0; top: 0;"  class="modal"><div id="gb-modal-content" class="modal-content" style=" background-color: #fefefe; margin: auto;  padding: 20px; border: 1px solid #888;  width: 70%;  border-radius: 30px;"><span id="gb-close-modal" class="close" style="color: #aaaaaa; float: right; font-size: 28px;  font-weight: bold; cursor: pointer;  focus:color: #000;">&times;</span>
 		    </div></div>`
-		document.body.innerHTML += modal;
+		// document.body.innerHTML += modal;
+
+        document.body.appendChild(modal);
 
 
 		let loader = `<div id="gb-loader" style="display: block; position: fixed;  margin: auto;  width: 100%;  background-color: rgba(0,0,0,0.4);  height: 100%;  z-index: 99999; padding-top: 100px; left: 0; top: 0;"  class="modal"><div id="gb-loader-content" class="modal-content" style=" background-color: #fefefe; margin: auto;  padding: 20px; border: 1px solid #888;  width: 70%;  border-radius: 30px;"><div style="width: 100%;  display: flex;  justify-content: center; margin: auto"><img src="https://ibank.greenbankcoin.com/images/processing.gif" id="loading-img" ></div></img></div></div>`
-		document.body.innerHTML += loader;
+		// document.body.innerHTML += loader;
+        document.body.appendChild(loader);
     };
 
 
@@ -17,7 +20,7 @@
     	let closeModalBtn = document.getElementById("gb-close-modal");
     	let modal = document.getElementById("gb-modal");
 		closeModalBtn.onclick = function() {
-  			modal.remove()
+  			// modal.remove()
 		}
     };
 
@@ -79,6 +82,9 @@
         //     const decoded = JSON.parse(data);
         //     console.log(decoded)
         // });
+
+
+        return
   
         
     };
@@ -97,13 +103,13 @@
 
         if (window) {
         	openModal()
-            createIframe(payload)
             closeModal()
+            createIframe(payload)
+           
         }
 		// console.log(urlParams);
         // console.log('about to pay a merchant', payload)
 
-        return
     }
     exports.exchangeRates = function() {};
     exports.exchange = function() {};
