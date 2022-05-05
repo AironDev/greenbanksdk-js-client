@@ -103,7 +103,7 @@
 		// console.log(urlParams);
         // console.log('about to pay a merchant', payload)
 
-        // return urlParams
+        return
     }
     exports.exchangeRates = function() {};
     exports.exchange = function() {};
