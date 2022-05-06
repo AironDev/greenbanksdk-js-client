@@ -98,7 +98,9 @@
                 const data = e.data;
                 if(data){
                     const decoded = JSON.parse(data);
-                    payload.callback(decoded)
+                    if( typeof payload.callback === 'function'){
+                        payload.callback(decoded)
+                    }
                 }
             });
         }
@@ -132,7 +134,9 @@
                 const data = e.data;
                 if(data){
                     const decoded = JSON.parse(data);
+                   if( typeof payload.callback === 'function'){
                     payload.callback(decoded)
+                   }
                 }
             });
     
@@ -151,4 +155,5 @@
 
 
 // module.exports = {log, shout, whisper};
+// import * as Greenbank from 'greenbanksdk-js-client'
 
