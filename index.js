@@ -2,11 +2,11 @@
 
 
     function openModal () {
-    	let modalString = `<div id="gb-modal" style="display: none; position: fixed;  margin: auto;  width: 100%;  background-color: rgba(0,0,0,0.4);  height: 100%;  z-index: 99999; padding-top: 100px; left: 0; top: 0;"  class="modal"><div id="gb-modal-content" class="modal-content" style=" background-color: #fefefe; margin: auto;  padding: 20px; border: 1px solid #888;  width: 90%;  border-radius: 30px;"><span id="gb-close-modal" class="close" style="color: #aaaaaa; float: right; font-size: 28px;  font-weight: bold; cursor: pointer;  focus:color: #000;">&times;</span>
+    	let modalString = `<div id="gb-modal" style="display: none; position: fixed;  margin: auto;  width: 100%;  background-color: rgba(0,0,0,0.4);  height: 100%;  z-index: 99999;  left: 0; top: 0;"  class="modal"><div id="gb-modal-content" class="modal-content" style=" background-color: #fefefe; margin: auto;   height: 100%;  padding: 20px; border: 1px solid #888;"><span id="gb-close-modal" class="close" style="color: #aaaaaa; float: right; font-size: 28px;  font-weight: bold; cursor: pointer;  focus:color: #000;">&times;</span>
 		    </div></div>`
         document.body.insertAdjacentHTML('afterend', modalString );
 
-		let loaderString = `<div id="gb-loader" style="display: block; position: fixed;  margin: auto;  width: 100%;  background-color: rgba(0,0,0,0.4);  height: 100%;  z-index: 99999; padding-top: 100px; left: 0; top: 0;"  class="modal"><div id="gb-loader-content" class="modal-content" style="height: 400px; background-color: #fefefe; margin: auto;  padding: 20px; border: 1px solid #888;  width: 90%;  border-radius: 30px;"><div style="width: 100%;  display: flex;  justify-content: center; margin: auto"><img src="https://ibank.greenbankcoin.com/images/processing.gif" id="loading-img" ></div></img></div></div>`
+		let loaderString = `<div id="gb-loader" style="display: block; position: fixed;  margin: auto;  width: 100%;  background-color: rgba(0,0,0,0.4);  height: 100%;  z-index: 99999;  left: 0; top: 0;"  class="modal"><div id="gb-loader-content" class="modal-content" style="height: 800px; background-color: #fefefe; margin: auto;  padding: 20px; border: 1px solid #888; "><div style="width: 100%;  display: flex;  justify-content: center; margin: auto"><img src="https://ibank.greenbankcoin.com/images/processing.gif" id="loading-img" ></div></img></div></div>`
 		document.body.insertAdjacentHTML('afterend', loaderString );
 
 
@@ -39,7 +39,7 @@
         frame.style.zIndex = '9999';
         frame.style.transition = 'left 1s ease, bottom 1s ease, right 1s ease';
         frame.style.width = '100%';
-        frame.style.height = '400px';
+        frame.style.height = '100%';
         frame.style.left = 'auto';
         frame.style.right = '-9999px';
         frame.style.bottom = '60px';
@@ -66,6 +66,53 @@
 
     exports.test = function() {
         return 'hello world'
+    };
+
+    exports.createPaymentLink = async function(payload) {
+        
+        let url = 'https://gcoin.greenbankcoin.com/api/v1/merchant/paymentlinks'
+        if(payload.domain === 'live'){
+            url = 'https://ibank.greenbankcoin.com/api/v1/merchant/paymentlinks'
+        }
+        if(payload.domain === 'sandbox'){
+            url = 'https://gcoin.greenbankcoin.com/api/v1/merchant/paymentlinks'
+        }
+
+        if(payload.domain === 'test'){
+            url = 'http://greenbankcoin.test/api/v1/merchant/paymentlinks'
+        }
+       
+       try {
+
+        const response = await fetch(url, {
+            method: "POST", // *GET, POST, PUT, DELETE, etc.
+            mode: "cors", // no-cors, *cors, same-origin
+            cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+            headers: {
+                "Content-Type": "application/json",
+                "Merchant-Apikey": payload.merchant_key,
+            },
+            body: JSON.stringify(payload), // body data type must match "Content-Type" header
+
+        });
+        
+        const jsonData = await response.json();
+
+        if (response?.ok) {
+            if( typeof payload.onSuccess === 'function'){
+                payload.onSuccess(jsonData)
+            }
+            return jsonData
+        } else {
+            if( typeof payload.onError === 'function'){
+                payload.onError(jsonData)
+            }
+            return null
+        }
+
+       } catch (error) {
+         console.error(error)
+       }
     };
 
 
@@ -108,26 +155,15 @@
     };
 
     exports.paymerchant = async function(payload) {
-    	// merchant_no, customer_email, meta, description,  currency, amount, domain
-    	payload.trxmeta = encodeURIComponent(JSON.stringify(payload.meta))
-    	delete payload.meta
-
-        let url = ''
-        if(payload.domain === 'live'){
-            url = 'https://ibank.greenbankcoin.com/g/paymerchant'
-        }
-        if(payload.domain === 'sandbox'){
-            url = 'https://gcoin.greenbankcoin.com/g/paymerchant'
-        }
-
-        if(payload.domain === 'test'){
-            url = 'http://greenbankcoin.test/g/paymerchant'
-        }
-       
-        if (window) {
+    	
+        let {onError, onSuccess,  callback, onClose, ...data}  = payload;
+        console.info('creating payment link')
+        let paymentLink = createPaymentLink(data)
+        
+        if (paymentLink) {
         	openModal()
             closeModal()
-            createIframe(url, payload)
+            createIframe(paymentLink.link)
 
             window.addEventListener('message', function (e) {
                 // Get the sent data
@@ -142,6 +178,8 @@
     
         }
     }
+
+
     exports.exchangeRates = function() {};
     exports.exchange = function() {};
 
