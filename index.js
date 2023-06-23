@@ -158,27 +158,40 @@
     	
         let {onError, onSuccess,  callback, onClose, ...data}  = payload;
         console.info('creating payment link')
-        let paymentLink = createPaymentLink(data)
-        
-        if (paymentLink) {
-        	openModal()
-            closeModal()
-            createIframe(paymentLink.link)
+        // let paymentLink = this.createPaymentLink(data)
 
-            window.addEventListener('message', function (e) {
-                // Get the sent data
-                const data = e.data;
-                if(data){
-                    const decoded = JSON.parse(data);
-                   if( typeof payload.callback === 'function'){
-                    payload.callback(decoded)
-                   }
-                }
-            });
-    
+        let url = 'https://gcoin.greenbankcoin.com/api/v1/merchant/paymentlinks'
+        if(data.domain === 'live'){
+            url = 'https://ibank.greenbankcoin.com/api/v1/merchant/paymentlinks'
         }
-    }
+        if(data.domain === 'sandbox'){
+            url = 'https://gcoin.greenbankcoin.com/api/v1/merchant/paymentlinks'
+        }
 
+        if(data.domain === 'test'){
+            url = 'http://greenbankcoin.test/api/v1/merchant/paymentlinks'
+        }
+
+        const response = await fetch(url, {
+            method: "POST", // *GET, POST, PUT, DELETE, etc.
+            mode: "cors", // no-cors, *cors, same-origin
+            cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+            headers: {
+                "Content-Type": "application/json",
+                "Merchant-Apikey": data.merchant_key,
+            },
+            body: JSON.stringify(data), // body data type must match "Content-Type" header
+
+        });
+        
+        const paymentLink = await response.json();
+                
+        if ( paymentLink?.data && paymentLink.data?.link) {
+            window.location = new URL(paymentLink.data.link)
+        }
+       
+      
+    }
 
     exports.exchangeRates = function() {};
     exports.exchange = function() {};

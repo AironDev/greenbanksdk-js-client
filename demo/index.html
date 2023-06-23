@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,77 +14,67 @@
 
 	<h1>Hello world</h1>
 	<button onclick="paymerchant()">Pay Merchant</button>
-	<button onclick="buycoin()">Buycoin</button>
-	<button onclick="createPaymentLink()">Create Payment Link</button>
-
-	<div id="result">
-
-	</div>
+	<button onclick="paymentlink()">Create Payment Link</button>
 
 	<script>
 
 		var apikey = window.prompt("Enter your api key");
 
-		function createPaymentLink(){
+		function paymentlink() {
 			//method will return payment reference
 			// merchant can then load the paymerchant page with the reference that was returned.
 			// pass redirect_url
 			// pass selected payment channels
 
 			let params = {
-				amount: 1, 
-				currency: 'NGN', 
-				description: 'Invoice payment Fee', 
-				channels: ["flutterwave","paypal"], 
-				customer_firstname: 'John', 
-				customer_lastname: 'Eliam', 
-				customer_email: 'user@onewattsolar.com', 
+				amount: 2000,
+				currency: 'NGN',
+				description: 'Invoice payment Fee',
+				channels: ["flutterwave", "paypal"],
+				customer_firstname: 'John',
+				customer_lastname: 'Eliam',
+				customer_email: 'user@onewattsolar.com',
 				redirect_url: "https://google.com",
 				meta: {
-					txntype: 'invoice_payment', 
+					txntype: 'invoice_payment',
 					invoice_id: 134
 				},
-				onSuccess: (res) =>{
+				onSuccess: (res) => {
 					// example - you can redirect to paymentlink here or just save the link
 					window.location = new URL(res.data.link)
 					console.log(res)
 				},
-				onError: (res) =>{
+				onError: (res) => {
 					alert('error occured')
 					console.log(res)
 				},
-				onClose: () =>{
+				onClose: () => {
 					alert('hello payment closed')
 					console.log('colose')
 				},
 				domain: 'test',
 				merchant_key: apikey,
 			}
-			
+
 			greenbank.createPaymentLink(params)
 
 		}
 
-		function paymerchant(){
+		function paymerchant() {
 
 			let payload = {
-				amount: 1, 
-				currency: 'NGN', 
-				description: 'Invoice payment Fee', 
-				channels: ["flutterwave","paypal"], 
-				customer_firstname: 'John', 
-				customer_lastname: 'Eliam', 
-				customer_email: 'user@onewattsolar.com', 
+				amount: 100,
+				currency: 'NGN',
+				description: 'Invoice payment Fee',
+				channels: ["flutterwave", "paypal"],
+				customer_firstname: 'John',
+				customer_lastname: 'Eliam',
+				customer_email: 'user@onewattsolar.com',
 				redirect_url: "https://google.com",
 				meta: {
-					txntype: 'invoice_payment', 
+					txntype: 'invoice_payment',
 					invoice_id: 134
 				},
-				callback: (res) =>{
-					// example - do something
-					console.log(res)
-				},
-				
 				domain: 'test',
 				merchant_key: apikey,
 			}
@@ -91,31 +82,9 @@
 			greenbank.paymerchant(payload)
 		}
 
-		function buycoin(){
-			let params = {
-				amount: 1, 
-				currency: 'USD', 
-				description: 'Approval Fee', 
-				domain: 'test',
-				merchant_no: 'F41FC311', 
-				email: 'user@onewattsolar.com', 
-				meta: {
-					txntype: 'approvalfee', 
-					reservation_id: 134
-				},
-				callback: (res) =>{
-					console.log(res)
-				},
-				onclose: () =>{
-					
-				}
-			}
-
-			greenbank.buycoin(params)
-		}
-		
 		//44caebfb-7a2c-4ac1-826b-ffecde4b07a3
 
 	</script>
 </body>
+
 </html>
