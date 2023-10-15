@@ -154,6 +154,28 @@
 
     };
 
+    exports.loadPaymentLinkModal = async function(link, params = {}, callback = () => {}) {
+
+    
+        if(window){
+        	openModal()
+            closeModal()
+            createIframe(link, params)
+
+            window.addEventListener('message', function (e) {
+                // Get the sent data
+                const data = e.data;
+                if(data){
+                    const decoded = JSON.parse(data);
+                    if( typeof callback === 'function'){
+                        callback(decoded)
+                    }
+                }
+            });
+        }
+
+    };
+
     exports.paymerchant = async function(payload) {
     	
         let {onError, onSuccess,  callback, onClose, ...data}  = payload;
