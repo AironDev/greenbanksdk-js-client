@@ -25,15 +25,11 @@
 		}
     };
 
-    function createIframe(url, payload) {
+    function createIframe(url) {
+
 
         const frame = document.createElement('iframe');
-        
-        // {merchant_no, customer_email, meta , description,  currency, amount, domain}
-        const urlParams = new URLSearchParams(payload).toString();
-        frame.src = `${url}?${urlParams}`;
-        
-
+        frame.src = url;
         frame.style.border = 'none';
         // frame.style.boxShadow = '0 20px 32px -8px rgba(9,20,66,0.25)';
         frame.style.zIndex = '9999';
@@ -138,7 +134,10 @@
         if(window){
         	openModal()
             closeModal()
-            createIframe(url, payload)
+
+            const urlParams = new URLSearchParams(payload).toString();
+            link = `${url}?${urlParams}`;
+            createIframe(link)
 
             window.addEventListener('message', function (e) {
                 // Get the sent data
