@@ -1,7 +1,7 @@
 (function(exports) {
 
 
-    function openModal () {
+    function openModal (onOpen = null) {
     	let modalString = `<div id="gb-modal" style="display: none; position: fixed;  margin: auto;  width: 100%;  background-color: rgba(0,0,0,0.4);  height: 100%;  z-index: 99999;  left: 0; top: 0;"  class="modal"><div id="gb-modal-content" class="modal-content" style=" background-color: #fefefe; margin: auto;   height: 100%;  padding: 20px; border: 1px solid #888;"><span id="gb-close-modal" class="close" style="color: #aaaaaa; float: right; font-size: 28px;  font-weight: bold; cursor: pointer;  focus:color: #000;">&times;</span>
 		    </div></div>`
         document.body.insertAdjacentHTML('afterend', modalString );
@@ -9,19 +9,20 @@
 		let loaderString = `<div id="gb-loader" style="display: block; position: fixed;  margin: auto;  width: 100%;  background-color: rgba(0,0,0,0.4);  height: 100%;  z-index: 99999;  left: 0; top: 0;"  class="modal"><div id="gb-loader-content" class="modal-content" style="height: 800px; background-color: #fefefe; margin: auto;  padding: 20px; border: 1px solid #888; "><div style="width: 100%;  display: flex;  justify-content: center; margin: auto"><img src="https://ibank.greenbankcoin.com/images/processing.gif" id="loading-img" ></div></img></div></div>`
 		document.body.insertAdjacentHTML('afterend', loaderString );
 
-
-        // let loaderWrapperDiv = document.createElement('div');
-        // loaderWrapperDiv.innerHTML = modalString;
-        // document.body.appendChild(loaderWrapperDiv)
+        if( typeof onOpen === 'function'){
+            onOpen()
+        }
     };
 
 
-  
-    function closeModal(){
+    function closeModal (onClose = null){
     	let closeModalBtn = document.getElementById("gb-close-modal");
     	let modal = document.getElementById("gb-modal");
 		closeModalBtn.onclick = function() {
   			modal.remove()
+            if( typeof onClose === 'function'){
+                onClose()
+            }
 		}
     };
 
@@ -82,8 +83,8 @@
 
         const response = await fetch(url, {
             method: "POST", // *GET, POST, PUT, DELETE, etc.
-            // mode: "cors", // no-cors, *cors, same-origin
-            // cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+            mode: "cors", // no-cors, *cors, same-origin
+            cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
             headers: {
                 "Content-Type": "application/json",
                 "Merchant-Apikey": payload.merchant_key,
@@ -95,7 +96,7 @@
         const jsonData = await response.json();
 
         if (response?.ok) {
-            if( typeof payload.onSuccess === 'function'){
+            if( payload.onSuccess &&  typeof payload.onSuccess === 'function'){
                 payload.onSuccess(jsonData)
             }
             return jsonData
@@ -110,7 +111,6 @@
          console.error(error)
        }
     };
-
 
     exports.buycoin = async function(payload) {
 
@@ -154,8 +154,6 @@
     };
 
     exports.loadPaymentLinkModal = async function(link, params = {}, callback = () => {}) {
-
-    
         if(window){
         	openModal()
             closeModal()
@@ -163,6 +161,7 @@
 
             window.addEventListener('message', function (e) {
                 // Get the sent data
+                console.log(e)
                 const data = e.data;
                 if(data){
                     const decoded = JSON.parse(data);
@@ -177,7 +176,7 @@
 
     exports.paymerchant = async function(payload) {
     	
-        let {onError, onSuccess,  callback, onClose, ...data}  = payload;
+        let {onError, onSuccess, onOpen, onClose, ...data}  = payload;
         console.info('creating payment link')
         // let paymentLink = this.createPaymentLink(data)
 
@@ -193,29 +192,117 @@
             url = 'http://greenbankcoin.test/api/v1/merchant/paymentlinks'
         }
 
-        const response = await fetch(url, {
-            method: "POST", // *GET, POST, PUT, DELETE, etc.
-            // mode: "cors", // no-cors, *cors, same-origin
-            // cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-            headers: {
-                "Content-Type": "application/json",
-                "Merchant-Apikey": data.merchant_key,
-            },
-            body: JSON.stringify(data), // body data type must match "Content-Type" header
+       try {
+         const response = await fetch(url, {
+             method: "POST", // *GET, POST, PUT, DELETE, etc.
+             mode: "cors", // no-cors, *cors, same-origin
+             cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+             headers: {
+                 "Content-Type": "application/json",
+                 "Merchant-Apikey": data.merchant_key,
+             },
+             body: JSON.stringify(data), // body data type must match "Content-Type" header
+ 
+         });
 
-        });
-        
-        const paymentLink = await response.json();
+         if (response?.ok) {
+            const paymentLink = await response.json();     
+            if ( paymentLink?.data && paymentLink.data?.link) {
+                //  option to choose how 
                 
-        if ( paymentLink?.data && paymentLink.data?.link) {
-            window.location = new URL(paymentLink.data.link)
+                console.info('created payment link', paymentLink.data)
+                // window.location = new URL(paymentLink.data.link)
+                if(window){
+                    openModal(onOpen)
+                    closeModal(onClose)
+                    
+                    console.info('Opening payment link')
+                    createIframe(paymentLink.data?.link)
+        
+                    window.addEventListener('message', function (e) {
+                        // Get the sent data
+                        console.info('Received message',e )
+                        const data = e.data;
+                        if(data){
+                            const decoded = JSON.parse(data);
+
+                            if(decoded.gbstatus == 'successful'){
+                                if( onSuccess && typeof onSuccess === 'function'){
+                                    closeModal()
+                                    onSuccess(decoded)
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        } else {
+            if( onError && typeof onError === 'function'){
+                onError(response)
+            }
         }
+
+         
+        
+       } catch (error) {
+            if( onError && typeof onError === 'function'){
+                onError(error)
+            }
+       }
        
       
     }
 
     exports.exchangeRates = function() {};
     exports.exchange = function() {};
+
+
+    exports.processPayment = async function(payload) {
+        let url = 'https://gcoin.greenbankcoin.com/api/v1/merchant/process-payment'
+        if(payload.domain === 'live'){
+            url = 'https://ibank.greenbankcoin.com/api/v1/merchant/process-payment'
+        }
+        if(payload.domain === 'sandbox'){
+            url = 'https://gcoin.greenbankcoin.com/api/v1/merchant/process-payment'
+        }
+
+        if(payload.domain === 'test'){
+            url = 'http://greenbankcoin.test/api/v1/merchant/process-payment'
+        }
+       
+       try {
+
+        const response = await fetch(url, {
+            method: "POST", // *GET, POST, PUT, DELETE, etc.
+            mode: "cors", // no-cors, *cors, same-origin
+            cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+            headers: {
+                "Content-Type": "application/json",
+                "Merchant-Apikey": payload.merchant_key,
+            },
+            body: JSON.stringify(payload), // body data type must match "Content-Type" header
+
+        });
+        
+        const jsonData = await response.json();
+
+        if (response?.ok) {
+            if( payload.onSuccess &&  typeof payload.onSuccess === 'function'){
+                payload.onSuccess(jsonData)
+            }
+            return jsonData
+        } else {
+            if( typeof payload.onError === 'function'){
+                payload.onError(jsonData)
+            }
+            return null
+        }
+
+       } catch (error) {
+         console.error(error)
+         return error
+       }
+    };
 
 })(typeof exports === 'undefined' ? this['greenbank'] = {} : exports);
 
