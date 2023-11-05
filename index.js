@@ -24,6 +24,10 @@
                 onClose()
             }
 		}
+        modal.remove()
+        if( typeof onClose === 'function'){
+            onClose()
+        }
     };
 
     function createIframe(url) {
@@ -133,8 +137,6 @@
 
         if(window){
         	openModal()
-            closeModal()
-
             const urlParams = new URLSearchParams(payload).toString();
             link = `${url}?${urlParams}`;
             createIframe(link)
@@ -214,7 +216,6 @@
                 // window.location = new URL(paymentLink.data.link)
                 if(window){
                     openModal(onOpen)
-                    closeModal(onClose)
                     
                     console.info('Opening payment link')
                     createIframe(paymentLink.data?.link)
@@ -238,7 +239,9 @@
             }
         } else {
             if( onError && typeof onError === 'function'){
+                closeModal()
                 onError(response)
+                
             }
         }
 
@@ -246,6 +249,7 @@
         
        } catch (error) {
             if( onError && typeof onError === 'function'){
+                closeModal()
                 onError(error)
             }
        }

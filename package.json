@@ -1,6 +1,6 @@
 {
   "name": "greenbanksdk-js-client",
-  "version": "1.0.15",
+  "version": "1.0.17",
   "description": "Greenbank Client Javascript SdK",
   "main": "index.js",
   "scripts": {
