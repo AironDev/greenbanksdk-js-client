@@ -15,19 +15,27 @@
     };
 
 
-    function closeModal (onClose = null){
+    function closeModal (isClicked = false, onClose = null){
     	let closeModalBtn = document.getElementById("gb-close-modal");
     	let modal = document.getElementById("gb-modal");
-		closeModalBtn.onclick = function() {
-  			modal.remove()
-            if( typeof onClose === 'function'){
-                onClose()
+		if(closeModalBtn && modal){
+            closeModalBtn.onclick = function() {
+                modal.remove()
+                if( typeof onClose === 'function'){
+                    onClose()
+                }
             }
-		}
-        modal.remove()
-        if( typeof onClose === 'function'){
-            onClose()
+            
+            if(isClicked){
+                closeModalBtn.click()
+            }
         }
+    //    if(isClicked && modal){
+    //     modal.remove()
+    //     if( typeof onClose === 'function'){
+    //         onClose()
+    //     }
+    //    } 
     };
 
     function createIframe(url) {
@@ -137,6 +145,7 @@
 
         if(window){
         	openModal()
+            closeModal()
             const urlParams = new URLSearchParams(payload).toString();
             link = `${url}?${urlParams}`;
             createIframe(link)
@@ -201,6 +210,7 @@
              cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
              headers: {
                  "Content-Type": "application/json",
+                 "Accept": "application/json",
                  "Merchant-Apikey": data.merchant_key,
              },
              body: JSON.stringify(data), // body data type must match "Content-Type" header
@@ -216,7 +226,8 @@
                 // window.location = new URL(paymentLink.data.link)
                 if(window){
                     openModal(onOpen)
-                    
+                    closeModal(false)
+
                     console.info('Opening payment link')
                     createIframe(paymentLink.data?.link)
         
@@ -229,8 +240,8 @@
 
                             if(decoded.gbstatus == 'successful'){
                                 if( onSuccess && typeof onSuccess === 'function'){
-                                    closeModal()
                                     onSuccess(decoded)
+                                    closeModal(true)
                                 }
                             }
                         }
@@ -239,8 +250,8 @@
             }
         } else {
             if( onError && typeof onError === 'function'){
-                closeModal()
                 onError(response)
+                closeModal(true)
                 
             }
         }
@@ -249,8 +260,8 @@
         
        } catch (error) {
             if( onError && typeof onError === 'function'){
-                closeModal()
                 onError(error)
+                closeModal(true)
             }
        }
        
