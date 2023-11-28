@@ -164,24 +164,45 @@
 
     };
 
-    exports.loadPaymentLinkModal = async function(link, params = {}, callback = () => {}) {
-        if(window){
-        	openModal()
-            closeModal()
-            createIframe(link, params)
+    exports.loadPaymentLinkModal = async function(payload, params = {}, callback = () => {}) {
 
-            window.addEventListener('message', function (e) {
-                // Get the sent data
-                console.log(e)
-                const data = e.data;
-                if(data){
-                    const decoded = JSON.parse(data);
-                    if( typeof callback === 'function'){
-                        callback(decoded)
+        let {link, onError, onSuccess, onOpen, onClose, ...data}  = payload;
+
+       
+        try {
+            console.info('opening payment link', link)
+            if(window){
+                openModal(onOpen)
+                closeModal(false)
+               
+
+                console.info('Opening payment link')
+                createIframe(link, params)
+
+                window.addEventListener('message', function (e) {
+                    // Get the sent data
+                    console.info('Received message',e )
+                    const data = e.data;
+                    if(data){
+                        const decoded = JSON.parse(data);
+
+                        if(decoded.gbstatus == 'successful'){
+                            if( onSuccess && typeof onSuccess === 'function'){
+                                onSuccess(decoded)
+                                closeModal(true)
+                            }
+                        }
                     }
-                }
-            });
-        }
+                });
+            }
+
+        } catch (error) {
+            if( onError && typeof onError === 'function'){
+                onError(error)
+                closeModal(true)
+            }
+       }
+
 
     };
 

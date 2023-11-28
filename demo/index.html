@@ -18,7 +18,8 @@
 
 	<script>
 
-		var apikey = window.prompt("Enter your api key");
+		// var apikey = window.prompt("Enter your api key");
+		var apikey = "44caebfb-7a2c-4ac1-826b-ffecde4b07a3";
 
 		function paymentlink() {
 			//method will return payment reference
@@ -30,7 +31,7 @@
 				amount: 2000,
 				currency: 'NGN',
 				description: 'Invoice payment Fee',
-				channels: ["flutterwave", "paypal"],
+				channels: ["flutterwave", "paypal", "greenbank", "stripe"],
 				customer_firstname: 'John',
 				customer_lastname: 'Eliam',
 				customer_email: 'user@onewattsolar.com',
@@ -43,6 +44,7 @@
 					// example - you can redirect to paymentlink here or just save the link
 					// window.location = new URL(res.data.link)
 					console.log(res)
+					greenbank.loadPaymentLinkModal(res.data.link)
 				},
 				onError: (res) => {
 					alert('error occured')
